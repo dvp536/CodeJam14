@@ -101,9 +101,16 @@ export const setupSocket = (io: Server) => {
       const room = rooms[roomId];
       const player = room?.players.find((p) => p.id === socket.id);
       if (room && player) {
-        player.betAmount = betAmount;
-        console.log(`Player ${player.username} bet $${betAmount} in room ${roomId}`);
-        checkAllBetsPlaced(io, room);
+        // Validate bet amount
+        if (betAmount > 0 && betAmount <= player.money) {
+          player.betAmount = betAmount;
+          player.money -= betAmount; // Deduct bet amount from player's money
+          console.log(`Player ${player.username} bet $${betAmount} in room ${roomId}`);
+          checkAllBetsPlaced(io, room);
+        } else {
+          // Send error to player
+          socket.emit('error', { message: 'Invalid bet amount' });
+        }
       }
     });
 
@@ -152,8 +159,9 @@ const generateRoomId = (): string => {
 
 // Start Betting Phase
 const startBettingPhase = async (io: Server, room: Room) => {
-  // Reset bets and answers
+  // Add $25 to each player's money and reset bets and answers
   room.players.forEach((player) => {
+    player.money += 25; // Add $25
     player.betAmount = 0;
     player.answer = null;
   });
@@ -223,10 +231,9 @@ const endRound = (io: Server, room: Room) => {
   const correctAnswer = room.currentQuestion?.correctAnswer;
   room.players.forEach((player) => {
     if (player.answer === correctAnswer) {
-      player.money += player.betAmount * 2;
-    } else {
-      // No change since bet amount was already deducted
+      player.money += player.betAmount * 2; // Player gains 2x bet amount (net gain of bet amount)
     }
+    // If incorrect, the player has already lost their bet amount
     // Reset bet and answer for the next round
     player.betAmount = 0;
     player.answer = null;
