@@ -251,7 +251,13 @@ const endRound = (io: Server, room: Room) => {
     const winner = room.players.reduce((prev, current) =>
       prev.money > current.money ? prev : current
     );
-    io.to(room.id).emit('gameOver', { winner });
+    io.to(room.id).emit('gameOver', {
+      winner: { username: winner.username, money: winner.money },
+      players: room.players.map((p) => ({
+        username: p.username,
+        money: p.money,
+      })),
+    });
     delete rooms[room.id];
     console.log(`Game over in room ${room.id}. Winner: ${winner.username}`);
   }

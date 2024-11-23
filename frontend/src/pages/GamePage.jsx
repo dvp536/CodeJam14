@@ -1,7 +1,7 @@
 // src/pages/GamePage.jsx
 
 import React, { useState, useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 function GamePage({ socket }) {
     const [phase, setPhase] = useState('betting'); // 'betting', 'question', 'results'
@@ -15,6 +15,7 @@ function GamePage({ socket }) {
     const [round, setRound] = useState(1);
     const totalRounds = 5;
 
+    const navigate = useNavigate();
     const query = new URLSearchParams(useLocation().search);
     const roomId = query.get('roomId');
     const username = query.get('username');
@@ -52,12 +53,8 @@ function GamePage({ socket }) {
         });
 
         // Handle game over
-        socket.on('gameOver', ({ winner }) => {
-            if (winner.username === username) {
-                alert(`Congratulations! You won the game with $${winner.money}!`);
-            } else {
-                alert(`Game Over! Winner is ${winner.username} with $${winner.money}`);
-            }
+        socket.on('gameOver', ({ winner, players }) => {
+            navigate('/game-over', { state: { winner, players } });
         });
 
         // Timer countdown
@@ -75,7 +72,7 @@ function GamePage({ socket }) {
             socket.off('gameOver');
             if (timerInterval) clearInterval(timerInterval);
         };
-    }, [socket, timer, username, playerMoney]);
+    }, [socket, timer, username, playerMoney, navigate]);
 
     // Place bet
     const handlePlaceBet = () => {

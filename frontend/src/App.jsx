@@ -9,6 +9,7 @@ import JoinRoomPage from './pages/JoinRoomPage';
 import GamePage from './pages/GamePage';
 import TutorialPage from './pages/TutorialPage';
 import LobbyPage from './pages/LobbyPage';
+import GameOverPage from './pages/GameOverPage';
 
 const socket = io('http://localhost:5000'); // Update the URL if needed
 
@@ -22,6 +23,7 @@ function App() {
         <Route path="/join-room" element={<JoinRoomPage socket={socket} />} />
         <Route path="/lobby" element={<LobbyPage socket={socket} />} />
         <Route path="/game" element={<GamePage socket={socket} />} />
+        <Route path="/game-over" element={<GameOverPage />} />
         <Route path="/tutorial" element={<TutorialPage />} />
       </Routes>
     </Router>
