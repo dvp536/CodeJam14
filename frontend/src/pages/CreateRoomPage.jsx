@@ -10,7 +10,7 @@ function CreateRoomPage({ socket }) {
   const handleCreateRoom = () => {
     socket.emit('createRoom', { username, subject });
     socket.on('roomCreated', ({ roomId }) => {
-      navigate(`/game?roomId=${roomId}&username=${username}`);
+      navigate(`/lobby?roomId=${roomId}&username=${username}`);
     });
   };
 

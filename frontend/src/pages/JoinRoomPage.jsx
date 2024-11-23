@@ -9,7 +9,7 @@ function JoinRoomPage({ socket }) {
   const handleJoinRoom = () => {
     socket.emit('joinRoom', { username, roomId });
     socket.on('playerJoined', () => {
-      navigate(`/game?roomId=${roomId}&username=${username}`);
+      navigate(`/lobby?roomId=${roomId}&username=${username}`);
     });
     socket.on('error', ({ message }) => {
       alert(message);
