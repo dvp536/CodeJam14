@@ -311,9 +311,7 @@ function GamePage({ socket }) {
                     : 'bg-white text-gray-700 hover:scale-105 hover:shadow-lg'
                     }`}
                 >
-                  <p className="text-xl font-semibold">{`${String.fromCharCode(
-                    65 + index
-                  )}. ${option}`}</p>
+                  <p className="text-xl font-semibold">{`${option}`}</p>
                 </div>
               ))}
             </div>
