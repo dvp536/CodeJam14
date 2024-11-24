@@ -191,6 +191,9 @@ function GamePage({ socket }) {
     setPhase('waiting');
   };
 
+  const getTimerClass = (time) =>
+    time > 0 && time <= 10 ? 'bg-red-600 animate-pulse' : 'bg-teal-600';
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-teal-500 to-cyan-400 flex flex-col items-center justify-center text-white p-6">
       {/* Notification Banner */}
@@ -206,13 +209,13 @@ function GamePage({ socket }) {
         </h2>
 
         {/* Timer and Money */}
-        <div className="flex justify-between items-center bg-teal-600 text-white font-semibold rounded-lg px-6 py-4 shadow-lg mb-6">
+        <div className={`flex justify-between items-center  text-white font-semibold rounded-lg px-6 py-4 shadow-lg mb-6 ${getTimerClass(timer)}`}>
           <div className="flex items-center space-x-4">
             <FaDollarSign className="text-2xl" />
             <p className="text-xl">Money: ${playerMoney}</p>
           </div>
           <div className="flex items-center space-x-4">
-            <FaClock className="text-2xl" />
+            <FaClock className={`text-2xl`} />
             <p className="text-xl">Timer: {timer}s</p>
           </div>
         </div>
