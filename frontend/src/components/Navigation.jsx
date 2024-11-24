@@ -6,7 +6,7 @@ function Navigation() {
   return (
     <nav>
       {/* Desktop Navigation */}
-      <div className="hidden md:flex justify-center space-x-6 py-4 bg-teal-500 shadow-lg">
+      <div className="hidden md:flex fixed top-0 left-0 w-full justify-center space-x-6 py-4 bg-teal-500 shadow-lg">
         <Link
           to="/"
           className="text-teal-600 text-lg font-bold bg-white rounded-full px-6 py-3 shadow-md hover:bg-gray-100 hover:scale-105 transition-transform duration-300 ease-in-out"
