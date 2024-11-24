@@ -1,10 +1,22 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+// src/pages/JoinRoomPage.jsx
+
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 function JoinRoomPage({ socket }) {
   const [username, setUsername] = useState('');
   const [roomId, setRoomId] = useState('');
   const navigate = useNavigate();
+  const location = useLocation();
+
+  useEffect(() => {
+    // Extract roomId from query parameters if available
+    const query = new URLSearchParams(location.search);
+    const roomIdFromUrl = query.get('roomId');
+    if (roomIdFromUrl) {
+      setRoomId(roomIdFromUrl);
+    }
+  }, [location]);
 
   const handleJoinRoom = () => {
     if (!username.trim() || !roomId.trim()) {
@@ -12,12 +24,23 @@ function JoinRoomPage({ socket }) {
       return;
     }
     socket.emit('joinRoom', { username, roomId });
-    socket.on('playerJoined', () => {
+
+    const handlePlayerJoined = () => {
       navigate(`/lobby?roomId=${roomId}&username=${username}`);
-    });
-    socket.on('error', ({ message }) => {
+    };
+
+    const handleError = ({ message }) => {
       alert(message);
-    });
+    };
+
+    socket.on('playerJoined', handlePlayerJoined);
+    socket.on('error', handleError);
+
+    // Clean up event listeners
+    return () => {
+      socket.off('playerJoined', handlePlayerJoined);
+      socket.off('error', handleError);
+    };
   };
 
   return (
@@ -45,6 +68,7 @@ function JoinRoomPage({ socket }) {
               onChange={(e) => setRoomId(e.target.value)}
               placeholder="Enter the room ID"
               className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring focus:ring-teal-300"
+              readOnly={Boolean(roomId)} // Make read-only if roomId is from URL
             />
           </div>
         </div>
