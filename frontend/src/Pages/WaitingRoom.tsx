@@ -8,7 +8,7 @@ interface Params {
 
 const WaitingRoom: React.FC = () => {
   const navigate = useNavigate();
-  const { roomCode } = useParams<Params>();
+  const { roomCode } = useParams();
 
   return (
     <div className="waiting-room-container">
