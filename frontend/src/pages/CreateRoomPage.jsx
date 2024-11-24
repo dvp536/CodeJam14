@@ -56,7 +56,7 @@ function CreateRoomPage({ socket }) {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-teal-500 to-cyan-400 flex flex-col items-center justify-center text-white p-6">
+    <div className="min-h-screen bg-gradient-to-b from-teal-500 to-cyan-400 flex flex-col items-center justify-center text-white p-6 py-24">
       <h2 className="text-3xl font-bold mb-8">Create Room</h2>
       <div className="w-full max-w-lg bg-white text-gray-800 rounded-lg shadow-lg p-6 space-y-4">
         {/* Username Input */}
