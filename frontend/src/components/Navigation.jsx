@@ -3,11 +3,39 @@ import { Link } from 'react-router-dom';
 
 function Navigation() {
   return (
-    <nav style={{ padding: '10px', backgroundColor: '#eee' }}>
-      <Link to="/" style={{ marginRight: '10px' }}>Start</Link>
-      <Link to="/create-room" style={{ marginRight: '10px' }}>Create Room</Link>
-      <Link to="/join-room" style={{ marginRight: '10px' }}>Join Room</Link>
-      <Link to="/tutorial">Tutorial</Link>
+    <nav className="bg-teal-500 py-4 shadow-lg">
+      <div className="flex justify-center space-x-6">
+        <Link
+          to="/"
+          className="text-teal-600 text-lg font-bold bg-white rounded-full px-6 py-3 shadow-lg hover:bg-gray-100 hover:scale-105 transition-transform duration-300 ease-in-out"
+        >
+          Start
+        </Link>
+        <Link
+          to="/create-room"
+          className="text-teal-600 text-lg font-bold bg-white rounded-full px-6 py-3 shadow-lg hover:bg-gray-100 hover:scale-105 transition-transform duration-300 ease-in-out"
+        >
+          Create Room
+        </Link>
+        <Link
+          to="/join-room"
+          className="text-teal-600 text-lg font-bold bg-white rounded-full px-6 py-3 shadow-lg hover:bg-gray-100 hover:scale-105 transition-transform duration-300 ease-in-out"
+        >
+          Join Room
+        </Link>
+        <Link
+          to="/tutorial"
+          className="text-teal-600 text-lg font-bold bg-white rounded-full px-6 py-3 shadow-lg hover:bg-gray-100 hover:scale-105 transition-transform duration-300 ease-in-out"
+        >
+          Tutorial
+        </Link>
+        <Link
+          to="/item-store"
+          className="text-teal-600 text-lg font-bold bg-white rounded-full px-6 py-3 shadow-lg hover:bg-gray-100 hover:scale-105 transition-transform duration-300 ease-in-out"
+        >
+          Item Store
+        </Link>
+      </div>
     </nav>
   );
 }

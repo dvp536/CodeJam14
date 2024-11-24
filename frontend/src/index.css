@@ -1,7 +1,18 @@
-/* src/index.css */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-/* Add your global styles here */
-body {
-  margin: 0;
-  font-family: Arial, sans-serif;
-}
+@keyframes fly {
+    0% {
+      opacity: 1;
+      transform: translate(0, 0) scale(1);
+    }
+    100% {
+      opacity: 0;
+      transform: translate(0, -50px) scale(0.8);
+    }
+  }
+  
+  .animate-fly {
+    animation: fly 1s ease-in forwards;
+  }

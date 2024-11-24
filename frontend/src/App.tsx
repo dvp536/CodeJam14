@@ -1,7 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { io } from 'socket.io-client';
-import './App.css';
 
 // Import pages
 import Page from './Pages/Menu';
@@ -12,6 +11,8 @@ import ScoreboardScreen from './Pages/ScoreboardScreen';
 
 // DO NOT CHANGE THESE PAGES
 import Navigation from './components/Navigation';
+import ItemStore from './components/ItemStore';
+
 import StartPage from './pages/StartPage';
 import CreateRoomPage from './pages/CreateRoomPage';
 import JoinRoomPage from './pages/JoinRoomPage';
@@ -54,6 +55,7 @@ const App: React.FC = () => {
             <Route path="/game-over" element={<GameOverPage />} />
             <Route path="/tutorial" element={<TutorialPage />} />
             <Route path="/audio" element={<PageApp />} />
+            <Route path="/item-store" element={<ItemStore />} />
           </Routes>
         </>
       )}
