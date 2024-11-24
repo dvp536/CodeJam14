@@ -295,14 +295,22 @@ function GamePage({ socket }) {
               Players' Money
             </h3>
             <ul className="space-y-2">
-              {playersInfo.map((player) => (
-                <li
-                  key={player.username}
-                  className="px-4 py-2 bg-gray-100 rounded-lg border border-gray-300 shadow-sm"
-                >
-                  {player.username}: ${player.money}
-                </li>
-              ))}
+              {playersInfo
+                .sort((a, b) => b.money - a.money)
+                .map((player, index) => (
+                  <li
+                    key={player.username}
+                    className={`flex justify-between px-4 py-2 rounded-lg border border-gray-300 shadow-sm ${player.username === username
+                      ? 'bg-teal-100 font-bold'
+                      : 'bg-gray-100'
+                      }`}
+                  >
+                    <span>
+                      {index + 1}. {player.username}
+                    </span>
+                    <span>${player.money}</span>
+                  </li>
+                ))}
             </ul>
           </>
         )}
@@ -370,7 +378,10 @@ function GamePage({ socket }) {
                 .map((player, index) => (
                   <li
                     key={player.username}
-                    className="flex justify-between px-4 py-2 bg-gray-100 rounded-lg border border-gray-300 shadow-sm"
+                    className={`flex justify-between px-4 py-2 rounded-lg border border-gray-300 shadow-sm ${player.username === username
+                      ? 'bg-teal-100 font-bold'
+                      : 'bg-gray-100'
+                      }`}
                   >
                     <span>
                       {index + 1}. {player.username}
@@ -397,14 +408,22 @@ function GamePage({ socket }) {
               Round Results
             </h3>
             <ul className="space-y-2">
-              {playersInfo.map((player) => (
-                <li
-                  key={player.username}
-                  className="px-4 py-2 bg-gray-100 rounded-lg border border-gray-300 shadow-sm"
-                >
-                  {player.username}: ${player.money}
-                </li>
-              ))}
+              {playersInfo
+                .sort((a, b) => b.money - a.money)
+                .map((player, index) => (
+                  <li
+                    key={player.username}
+                    className={`flex justify-between px-4 py-2 rounded-lg border border-gray-300 shadow-sm ${player.username === username
+                      ? 'bg-teal-100 font-bold'
+                      : 'bg-gray-100'
+                      }`}
+                  >
+                    <span>
+                      {index + 1}. {player.username}
+                    </span>
+                    <span>${player.money}</span>
+                  </li>
+                ))}
             </ul>
           </>
         )}
