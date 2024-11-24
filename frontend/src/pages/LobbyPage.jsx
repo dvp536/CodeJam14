@@ -1,13 +1,20 @@
+// src/pages/LobbyPage.jsx
+
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import QRCode from 'react-qr-code';
 
 function LobbyPage({ socket }) {
   const [players, setPlayers] = useState([]);
   const [isHost, setIsHost] = useState(false);
+  const [copySuccess, setCopySuccess] = useState('');
   const query = new URLSearchParams(useLocation().search);
   const roomId = query.get('roomId');
   const username = query.get('username');
   const navigate = useNavigate();
+
+  // **Updated invite link to match the route in App.tsx**
+  const inviteLink = `${window.location.origin}/join-room?roomId=${roomId}`;
 
   useEffect(() => {
     // Event handlers
@@ -42,6 +49,18 @@ function LobbyPage({ socket }) {
     socket.emit('startGame', { roomId });
   };
 
+  const handleCopyLink = () => {
+    navigator.clipboard
+      .writeText(inviteLink)
+      .then(() => {
+        setCopySuccess('Link copied to clipboard!');
+        setTimeout(() => setCopySuccess(''), 3000);
+      })
+      .catch((err) => {
+        console.error('Failed to copy: ', err);
+      });
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-teal-500 to-cyan-400 flex flex-col items-center justify-center text-white p-6">
       {/* Room Info */}
@@ -49,6 +68,34 @@ function LobbyPage({ socket }) {
         <h2 className="text-2xl font-bold text-teal-600 mb-4">
           Lobby - Room ID: <span className="font-mono text-gray-700">{roomId}</span>
         </h2>
+
+        {/* Invite Link Section */}
+        <div className="mb-6">
+          <p className="text-gray-700 mb-2">Invite your friends:</p>
+          <div className="flex items-center space-x-2">
+            <input
+              type="text"
+              readOnly
+              value={inviteLink}
+              className="flex-1 px-4 py-2 border rounded-lg focus:outline-none focus:ring focus:ring-teal-300"
+            />
+            <button
+              onClick={handleCopyLink}
+              className="bg-teal-600 text-white font-semibold rounded-lg px-4 py-2 shadow-md hover:bg-teal-700 transition duration-300"
+            >
+              Copy Link
+            </button>
+          </div>
+          {copySuccess && (
+            <p className="text-green-600 font-medium mt-2">{copySuccess}</p>
+          )}
+        </div>
+
+        {/* QR Code */}
+        <div className="mb-6 flex justify-center">
+          <QRCode value={inviteLink} size={128} />
+        </div>
+
         <h3 className="text-lg font-semibold text-gray-700 mb-3">Players in Room:</h3>
 
         {/* Players List */}
