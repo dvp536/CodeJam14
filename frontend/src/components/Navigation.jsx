@@ -29,6 +29,12 @@ function Navigation() {
         >
           Tutorial
         </Link>
+        <Link
+          to="/item-store"
+          className="text-teal-600 text-lg font-bold bg-white rounded-full px-6 py-3 shadow-lg hover:bg-gray-100 hover:scale-105 transition-transform duration-300 ease-in-out"
+        >
+          Item Store
+        </Link>
       </div>
     </nav>
   );
