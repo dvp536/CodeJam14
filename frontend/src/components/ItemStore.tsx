@@ -14,18 +14,17 @@ const poisonpotion = new URL('../assets/Images/items/poison-potion.svg', import.
 const shield= new URL('../assets/Images/items/shield.svg', import.meta.url).href;
 
 const mockItems = [
-  { name: "Double or Nothing Coin", price: 50, icon: joker},
   { name: "Time Extender", price: 30, icon: hourglass  },
-  { name: "Freeze Frenzy", price: 40, icon: freeze_frenzy },
-  { name: "Lucky Charm", price: 25, icon:  lucky_charm},
-  { name: "Confusion Bomb", price: 60, icon: distraction },
+  { name: "Double or Nothing", price: 50, icon: double_nothing},
+  { name: "Distraction Bomb", price: 60, icon: distraction },
   { name: "Insight Glasses", price: 45, icon: glasses },
   { name: "Cheating Joker", price: 45, icon: joker},
-  { name: "Hourglass Loop", price: 45, icon: hourglass },
-  { name: "Sneaky Magnet", price: 45, icon: magnet},
+  { name: "Multiplying Potion", price: 45, icon: multipotion },
   { name: "Light Shield", price: 45, icon: shield },
-  { name: "Distraction Bomb", price: 45, icon: distraction },
-
+  { name: "Poison Potion", price: 45, icon: poisonpotion },
+  { name: "Lucky Charm", price: 25, icon:  lucky_charm},
+  { name: "Freeze Frenzy", price: 40, icon: freeze_frenzy },
+  { name: "Sneaky Magnet", price: 45, icon: magnet},
 ];
 
 const ItemStore: React.FC = () => {
