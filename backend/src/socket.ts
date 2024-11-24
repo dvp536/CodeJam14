@@ -10,7 +10,8 @@ interface Player {
   socketId: string;
   betAmount: number | null;
   answer: string | null;
-  isReady: boolean; // New property
+  isReady: boolean;
+  isCorrect: boolean | null; // New property to track correctness
 }
 
 interface GameSettings {
@@ -31,8 +32,11 @@ interface Room {
   gameStarted: boolean;
   bettingTimer: NodeJS.Timeout | null;
   questionTimer: NodeJS.Timeout | null;
+  leaderboardTimer: NodeJS.Timeout | null; // New timer for leaderboard phase
   settings: GameSettings;
-  waitingForPlayers: boolean; // New property
+  waitingForPlayers: boolean;
+  roundInProgress: boolean; // New flag to prevent multiple endRound calls
+
 }
 
 interface QuestionData {
@@ -57,7 +61,8 @@ export const setupSocket = (io: Server) => {
         socketId: socket.id,
         betAmount: 0,
         answer: null,
-        isReady: false, // Initialize to false
+        isReady: false,
+        isCorrect: null,
       };
       const room: Room = {
         id: roomId,
@@ -69,15 +74,16 @@ export const setupSocket = (io: Server) => {
         gameStarted: false,
         bettingTimer: null,
         questionTimer: null,
+        leaderboardTimer: null,
         settings,
-        waitingForPlayers: false, // Initialize to false
+        waitingForPlayers: false,
+        roundInProgress: false,
       };
       rooms[roomId] = room;
       socket.join(roomId);
       socket.emit('roomCreated', { roomId });
       console.log(`Room created with ID: ${roomId}`);
     });
-
 
     // Handle 'joinRoom' event
     socket.on('joinRoom', ({ username, roomId }) => {
@@ -90,7 +96,8 @@ export const setupSocket = (io: Server) => {
           socketId: socket.id,
           betAmount: 0,
           answer: null,
-          isReady: false, // Initialize to false
+          isReady: false,
+          isCorrect: null,
         };
         room.players.push(player);
         socket.join(roomId);
@@ -102,14 +109,14 @@ export const setupSocket = (io: Server) => {
     });
 
     // Handle 'startGame' event
-    socket.on('startGame', async ({ roomId }) => {
+    socket.on('startGame', ({ roomId }) => {
       const room = rooms[roomId];
       if (room && !room.gameStarted) {
         room.gameStarted = true;
         io.to(roomId).emit('gameStarted');
         room.currentRound = 1;
-        room.waitingForPlayers = true; // Wait for players to be ready
-        // Do not call startBettingPhase yet
+        room.waitingForPlayers = true;
+        // Do not call startBettingPhase yet; wait for players to be ready
       }
     });
 
@@ -190,11 +197,20 @@ const generateRoomId = (): string => {
 
 // Start Betting Phase
 const startBettingPhase = async (io: Server, room: Room) => {
+  // Reset roundInProgress flag
+  room.roundInProgress = true;
+
+  // Clear any existing timers
+  if (room.bettingTimer) clearTimeout(room.bettingTimer);
+  if (room.questionTimer) clearTimeout(room.questionTimer);
+  if (room.leaderboardTimer) clearTimeout(room.leaderboardTimer);
+
   // Add additional money to each player at the start of the round
   room.players.forEach((player) => {
     player.money += room.settings.additionalMoneyPerRound;
     player.betAmount = null;
     player.answer = null;
+    player.isCorrect = null;
   });
 
   io.to(room.id).emit('bettingPhase', {
@@ -209,6 +225,13 @@ const startBettingPhase = async (io: Server, room: Room) => {
   // Start betting timer
   room.bettingTimer = setTimeout(() => {
     console.log(`Betting phase timer ended for room ${room.id}`);
+    // Assign default bet of $0 to players who didn't place a bet
+    room.players.forEach((player) => {
+      if (player.betAmount === null) {
+        player.betAmount = 0;
+        console.log(`Player ${player.username} did not place a bet. Default bet of $0 assigned.`);
+      }
+    });
     startQuestionPhase(io, room);
   }, room.settings.bettingTime * 1000);
 };
@@ -226,12 +249,8 @@ const checkAllBetsPlaced = (io: Server, room: Room) => {
 // Start Question Phase
 const startQuestionPhase = async (io: Server, room: Room) => {
   try {
-    room.players.forEach((player) => {
-      if (player.betAmount === null) {
-        player.betAmount = 0;
-        console.log(`Player ${player.username} did not place a bet. Default bet of $0 assigned.`);
-      }
-    });
+    // Clear any existing timers
+    if (room.questionTimer) clearTimeout(room.questionTimer);
 
     const questionData = await getQuestionForSubject(room.subject);
     room.currentQuestion = questionData;
@@ -245,11 +264,18 @@ const startQuestionPhase = async (io: Server, room: Room) => {
 
     console.log(`Question phase started for room ${room.id}`);
 
-    // Start question timer using the configurable question time
+    // Start question timer
     room.questionTimer = setTimeout(() => {
       console.log(`Question phase timer ended for room ${room.id}`);
+      // Assign null answers to players who didn't submit
+      room.players.forEach((player) => {
+        if (player.answer === null) {
+          player.answer = null;
+          console.log(`Player ${player.username} did not answer. Default answer assigned.`);
+        }
+      });
       endRound(io, room);
-    }, room.settings.questionTime * 1000); // Convert seconds to milliseconds
+    }, room.settings.questionTime * 1000);
   } catch (error) {
     io.to(room.id).emit('error', { message: 'Failed to get a new question.' });
   }
@@ -265,46 +291,115 @@ const checkAllAnswersSubmitted = (io: Server, room: Room) => {
   }
 };
 
+
 // End the Round
 const endRound = (io: Server, room: Room) => {
+
+  if (!room.roundInProgress) {
+    // Round has already ended; do not proceed
+    return;
+  }
+  // Mark the round as ended
+  room.roundInProgress = false;
+
   const correctAnswer = room.currentQuestion?.correctAnswer;
+
   room.players.forEach((player) => {
     if (player.answer === correctAnswer) {
-      player.money += (player.betAmount ?? 0) * 2; // Player gains 2x bet amount (net gain of bet amount)
+      player.money += (player.betAmount ?? 0) * 2; // Player gains 2x bet amount
+      player.isCorrect = true;
+    } else {
+      player.isCorrect = false;
     }
-    // If incorrect, the player has already lost their bet amount
     // Reset bet and answer for the next round
     player.betAmount = 0;
     player.answer = null;
   });
 
-  io.to(room.id).emit('roundEnded', {
-    correctAnswer,
+  // Emit 'leaderboardPhase' instead of 'roundEnded'
+  io.to(room.id).emit('leaderboardPhase', {
     players: room.players.map((p) => ({
       username: p.username,
       money: p.money,
+      isCorrect: p.isCorrect,
     })),
+    correctAnswer,
+    round: room.currentRound,
+    totalRounds: room.settings.totalRounds,
+    leaderboardTime: 10, // 10-second timer
   });
+
 
   console.log(`Round ${room.currentRound} ended for room ${room.id}`);
 
-  // Proceed to next round or end game
-  if (room.currentRound < room.settings.totalRounds) {
-    room.currentRound += 1;
-    startBettingPhase(io, room);
-  } else {
-    // End game and announce winner
-    const winner = room.players.reduce((prev, current) =>
-      prev.money > current.money ? prev : current
-    );
-    io.to(room.id).emit('gameOver', {
-      winner: { username: winner.username, money: winner.money },
-      players: room.players.map((p) => ({
-        username: p.username,
-        money: p.money,
-      })),
-    });
-    delete rooms[room.id];
-    console.log(`Game over in room ${room.id}. Winner: ${winner.username}`);
-  }
+  // Start Leaderboard Timer
+  room.leaderboardTimer = setTimeout(() => {
+    console.log(`Leaderboard timer ended for room ${room.id}`);
+
+    // Proceed to next round or end game
+    if (room.currentRound < room.settings.totalRounds) {
+      room.currentRound += 1;
+      startBettingPhase(io, room);
+    } else {
+      // Clear any existing timers
+      if (room.bettingTimer) clearTimeout(room.bettingTimer);
+      if (room.questionTimer) clearTimeout(room.questionTimer);
+      if (room.leaderboardTimer) clearTimeout(room.leaderboardTimer);
+
+      // Proceed to end the game
+      const winner = room.players.reduce((prev, current) =>
+        prev.money > current.money ? prev : current
+      );
+      io.to(room.id).emit('gameOver', {
+        winner: { username: winner.username, money: winner.money },
+        players: room.players.map((p) => ({
+          username: p.username,
+          money: p.money,
+        })),
+      });
+      delete rooms[room.id];
+      console.log(`Game over in room ${room.id}. Winner: ${winner.username}`);
+    }
+  }, 10000); // 10 seconds
+};
+
+// Start Leaderboard Phase
+const startLeaderboardPhase = (io: Server, room: Room) => {
+  io.to(room.id).emit('leaderboardPhase', {
+    players: room.players.map((p) => ({
+      username: p.username,
+      money: p.money,
+      isCorrect: p.isCorrect,
+    })),
+    round: room.currentRound,
+    totalRounds: room.settings.totalRounds,
+    leaderboardTime: 10, // 10-second timer for leaderboard phase
+  });
+
+  console.log(`Leaderboard phase started for room ${room.id}`);
+
+  // Start leaderboard timer
+  room.leaderboardTimer = setTimeout(() => {
+    console.log(`Leaderboard timer ended for room ${room.id}`);
+
+    // Proceed to next round or end game
+    if (room.currentRound < room.settings.totalRounds) {
+      room.currentRound += 1;
+      startBettingPhase(io, room);
+    } else {
+      // End game and announce winner
+      const winner = room.players.reduce((prev, current) =>
+        prev.money > current.money ? prev : current
+      );
+      io.to(room.id).emit('gameOver', {
+        winner: { username: winner.username, money: winner.money },
+        players: room.players.map((p) => ({
+          username: p.username,
+          money: p.money,
+        })),
+      });
+      delete rooms[room.id];
+      console.log(`Game over in room ${room.id}. Winner: ${winner.username}`);
+    }
+  }, 10000); // 10 seconds
 };
