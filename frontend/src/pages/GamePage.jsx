@@ -18,6 +18,7 @@ function GamePage({ socket }) {
   const [leaderboardTimer, setLeaderboardTimer] = useState(10);
   const [isCorrect, setIsCorrect] = useState(false);
   const [subject, setSubject] = useState(''); // New state for the subject
+  const [correctAnswer, setCorrectAnswer] = useState('');
 
   const query = new URLSearchParams(useLocation().search);
   const roomId = query.get('roomId');
@@ -65,6 +66,7 @@ function GamePage({ socket }) {
     setRound(data.round);
     setTotalRounds(data.totalRounds);
     setPlayersInfo(data.players);
+    setCorrectAnswer(data.correctAnswer || ''); // Set the correct answer
     setIsCorrect(
       data.players.find((p) => p.username === username)?.isCorrect
     );
@@ -186,6 +188,16 @@ function GamePage({ socket }) {
   const getTimerClass = (time) =>
     time > 0 && time <= 10 ? 'bg-red-600 animate-pulse' : 'bg-teal-600';
 
+  const getCorrectOptionText = () => {
+    const index = letterToIndex[correctAnswer];
+    if (index !== undefined && options[index]) {
+      return options[index];
+    }
+    return '';
+  };
+
+  const letterToIndex = { A: 0, B: 1, C: 2, D: 3 };
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-teal-500 to-cyan-400 flex flex-col items-center justify-center text-white p-6">
       {/* Notification Banner */}
@@ -243,8 +255,8 @@ function GamePage({ socket }) {
                     key={percentage}
                     onClick={() => setBetAmount(calculatedAmount)}
                     className={`px-4 py-2 font-semibold rounded-lg shadow-md transition-transform duration-300 ${betAmount === calculatedAmount
-                        ? 'bg-teal-700 text-white scale-105'
-                        : 'bg-gray-100 text-gray-700 hover:bg-teal-600 hover:text-white'
+                      ? 'bg-teal-700 text-white scale-105'
+                      : 'bg-gray-100 text-gray-700 hover:bg-teal-600 hover:text-white'
                       }`}
                   >
                     {percentage}% (${calculatedAmount})
@@ -339,6 +351,15 @@ function GamePage({ socket }) {
             >
               {isCorrect ? 'You got it right!' : 'You got it wrong.'}
             </p>
+            {/* Display the correct answer */}
+            <p className="text-gray-800 font-medium mb-2">
+              The correct answer was:
+            </p>
+            <div
+              className={`p-6 border-2 rounded-lg shadow-md bg-green-100 border-green-500 mb-4`}
+            >
+              <p className="text-xl font-semibold">{getCorrectOptionText()}</p>
+            </div>
             <h4 className="text-lg font-bold text-gray-700 mb-2">
               Leaderboard
             </h4>
