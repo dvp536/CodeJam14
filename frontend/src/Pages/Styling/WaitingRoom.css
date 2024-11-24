@@ -1,0 +1,20 @@
+.waiting-room-container {
+    padding: 20px;
+    text-align: center;
+  }
+  
+  .waiting-room-title {
+    font-size: 24px;
+    color: #333;
+  }
+  
+  .waiting-room-info {
+    font-size: 18px;
+    margin: 10px 0;
+  }
+  
+  .waiting-room-message {
+    font-size: 16px;
+    color: #555;
+  }
+  

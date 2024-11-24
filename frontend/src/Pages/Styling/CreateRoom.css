@@ -1,0 +1,102 @@
+/* General container styling */
+.create-room-container {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+  }
+  
+  /* Back button styling */
+  .back-button {
+    padding: 10px 20px;
+    font-size: 16px;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    align-self: flex-start;
+  }
+  
+  .back-button:hover {
+    background-color: #0056b3;
+  }
+  
+  /* Title styling */
+  .create-room-title {
+    font-size: 24px;
+    color: #333;
+    margin-bottom: 10px;
+  }
+  
+  /* Input field styling */
+  .room-input {
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    width: 100%;
+    max-width: 400px;
+  }
+  
+  /* Label styling */
+  .label {
+    font-size: 14px;
+    color: #555;
+    margin-bottom: 5px;
+  }
+  
+  /* Buttons styling */
+  .room-button, .room-reset-button {
+    padding: 10px 20px;
+    font-size: 16px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .room-button {
+    background-color: #28a745;
+    color: white;
+  }
+  
+  .room-button:hover {
+    background-color: #218838;
+  }
+  
+  .room-reset-button {
+    background-color: #ffc107;
+    color: black;
+  }
+  
+  .room-reset-button:hover {
+    background-color: #e0a800;
+  }
+  
+  /* Preview box styling */
+  .room-preview {
+    margin-top: 20px;
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    width: 100%;
+    max-width: 400px;
+    text-align: left;
+    background-color: #f9f9f9;
+  }
+  
+  .room-preview h3 {
+    font-size: 18px;
+    margin-bottom: 10px;
+    color: #333;
+  }
+  
+  .room-preview p {
+    font-size: 16px;
+    color: #555;
+    margin: 5px 0;
+  }
+  
