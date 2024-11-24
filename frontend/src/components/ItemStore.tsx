@@ -13,18 +13,32 @@ const multipotion = new URL('../assets/Images/items/multi-potion.svg', import.me
 const poisonpotion = new URL('../assets/Images/items/poison-potion.svg', import.meta.url).href;
 const shield= new URL('../assets/Images/items/shield.svg', import.meta.url).href;
 
+// sound effects
+const joker_sound = new URL('../assets/SoundEffects/SoundCheatingJoker.mp3', import.meta.url).href;
+const distraction_sound = new URL('../assets/SoundEffects/SoundDistractionBomb.mp3', import.meta.url).href;
+const double_nothing_sound = new URL('../assets/SoundEffects/SoundDoubleOrNothing.mp3', import.meta.url).href;
+const freeze_frenzy_sound = new URL('../assets/SoundEffects/SoundFreezeFrenzy.mp3', import.meta.url).href;
+const glasses_sound = new URL('../assets/SoundEffects/SoundInsightGlasses.mp3', import.meta.url).href;
+const hourglass_sound = new URL('../assets/SoundEffects/SoundTimeLoop.mp3', import.meta.url).href;
+const lucky_charm_sound = new URL('../assets/SoundEffects/SoundLuckyCharm.mp3', import.meta.url).href;
+const magnet_sound = new URL('../assets/SoundEffects/SoundMoneyMagnet.mp3', import.meta.url).href;
+const multipotion_sound = new URL('../assets/SoundEffects/SoundMultiplierPotion.mp3', import.meta.url).href;
+const poisonpotion_sound = new URL('../assets/SoundEffects/SoundPoisonPotion.mp3', import.meta.url).href;
+const shield_sound = new URL('../assets/SoundEffects/SoundAnswerShield.mp3', import.meta.url).href;
+
+
 const mockItems = [
-  { name: "Time Extender", price: 30, icon: hourglass  },
-  { name: "Double or Nothing", price: 50, icon: double_nothing},
-  { name: "Distraction Bomb", price: 60, icon: distraction },
-  { name: "Insight Glasses", price: 45, icon: glasses },
-  { name: "Cheating Joker", price: 45, icon: joker},
-  { name: "Multiplying Potion", price: 45, icon: multipotion },
-  { name: "Light Shield", price: 45, icon: shield },
-  { name: "Poison Potion", price: 45, icon: poisonpotion },
-  { name: "Lucky Charm", price: 25, icon:  lucky_charm},
-  { name: "Freeze Frenzy", price: 40, icon: freeze_frenzy },
-  { name: "Sneaky Magnet", price: 45, icon: magnet},
+  { name: "Time Extender", price: 30, icon: hourglass, audio: hourglass_sound },
+  { name: "Double or Nothing", price: 50, icon: double_nothing, audio: double_nothing_sound },
+  { name: "Distraction Bomb", price: 60, icon: distraction, audio: distraction_sound },
+  { name: "Insight Glasses", price: 45, icon: glasses, audio: glasses_sound },
+  { name: "Cheating Joker", price: 45, icon: joker, audio: joker_sound },
+  { name: "Multiplying Potion", price: 45, icon: multipotion, audio: multipotion_sound },
+  { name: "Light Shield", price: 45, icon: shield, audio: shield_sound },
+  { name: "Poison Potion", price: 45, icon: poisonpotion, audio: poisonpotion_sound },
+  { name: "Lucky Charm", price: 25, icon:  lucky_charm, audio: lucky_charm_sound },
+  { name: "Freeze Frenzy", price: 40, icon: freeze_frenzy, audio: freeze_frenzy_sound },
+  { name: "Sneaky Magnet", price: 45, icon: magnet, audio: magnet_sound },
 ];
 
 const ItemStore: React.FC = () => {
@@ -54,6 +68,7 @@ const ItemStore: React.FC = () => {
                 name={item.name}
                 price={item.price}
                 icon={item.icon}
+                audio={item.audio}
                 onBuy={() => handleBuy(item.price)}
                 />
             ))}
