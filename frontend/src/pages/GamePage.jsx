@@ -207,7 +207,7 @@ function GamePage({ socket }) {
         </div>
       )}
 
-      <div className="w-full max-w-lg bg-white text-gray-800 rounded-lg shadow-lg p-6">
+      <div className="w-full max-w-lg bg-white text-gray-800 rounded-lg shadow-lg p-6 pb-20">
         <h2 className="text-xl font-bold text-teal-600 mb-4">
           Round {round} of {totalRounds}
         </h2>
