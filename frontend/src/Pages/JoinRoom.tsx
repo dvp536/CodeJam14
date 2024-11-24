@@ -1,13 +1,13 @@
-import { useState } from 'react';
+import React, { useState, ChangeEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './Styling/JoinRoom.css';
 
 function JoinRoom() {
   const navigate = useNavigate();
-  const [roomCode, setRoomCode] = useState('');
-  const [error, setError] = useState('');
+  const [roomCode, setRoomCode] = useState<string>('');
+  const [error, setError] = useState<string>('');
 
-  const validateRoomCode = (code) => /^[A-Z0-9]{6}$/.test(code);
+  const validateRoomCode = (code: string): boolean => /^[A-Z0-9]{6}$/.test(code);
 
   const handleJoinRoom = () => {
     if (!validateRoomCode(roomCode)) {
@@ -26,7 +26,7 @@ function JoinRoom() {
         className="join-room-input"
         placeholder="Enter Room Code"
         value={roomCode}
-        onChange={(e) => setRoomCode(e.target.value)}
+        onChange={(e: ChangeEvent<HTMLInputElement>) => setRoomCode(e.target.value)}
       />
       {error && <p className="join-room-error">{error}</p>}
       <button

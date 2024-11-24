@@ -1,11 +1,11 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import './Styling/Game.css';
 
 function Game() {
-  const [question, setQuestion] = useState('What is the capital of France?');
-  const [answer, setAnswer] = useState('');
+  const [question, setQuestion] = useState<string>('What is the capital of France?');
+  const [answer, setAnswer] = useState<string>('');
 
-  const handleAnswer = (selectedAnswer) => {
+  const handleAnswer = (selectedAnswer: string) => {
     setAnswer(selectedAnswer);
     console.log(`Answered: ${selectedAnswer}`);
   };
