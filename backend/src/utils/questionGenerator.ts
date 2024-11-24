@@ -10,7 +10,8 @@ const openai = new OpenAI({
 });
 
 export const getQuestionForSubject = async (subject: string) => {
-  const prompt = `Generate a multiple-choice trivia question about ${subject} with 4 options. Indicate the correct answer. Format:
+  const prompt = `As a trivia quiz generator, create a medium to challenging multiple-choice question about "${subject}". Indicate the correct answer. Format:
+
 Question: ...
 A) Option 1
 B) Option 2
@@ -20,11 +21,17 @@ Correct Answer: A/B/C/D`;
 
   try {
     const completion = await openai.chat.completions.create({
-      model: 'gpt-3.5-turbo',
+      model: 'gpt-4o-mini',
       messages: [
-        { role: 'system', content: 'You are a helpful assistant.' },
+        {
+          role: 'system',
+          content:
+            'You are a helpful assistant that generates unique and interesting trivia questions for a quiz game.',
+        },
         { role: 'user', content: prompt },
       ],
+      temperature: 0.8, // Increased for more randomness
+      max_tokens: 200, // Adjusted to accommodate longer responses
     });
 
     const text = completion.choices[0]?.message?.content || '';
@@ -53,11 +60,11 @@ const parseQuestion = (text: string) => {
     } else if (/^[A-D]\)/.test(line)) {
       options.push(line.trim());
     } else if (line.startsWith('Correct Answer:')) {
-      correctAnswer = line.replace('Correct Answer:', '').trim();
+      correctAnswer = line.replace('Correct Answer:', '').trim().toUpperCase();
     }
   }
 
-  if (question && options.length === 4 && correctAnswer) {
+  if (question && options.length === 4 && /^[A-D]$/.test(correctAnswer)) {
     return { question, options, correctAnswer };
   } else {
     return null;
