@@ -20,7 +20,7 @@ import GamePage from './pages/GamePage';
 import TutorialPage from './pages/TutorialPage';
 import LobbyPage from './pages/LobbyPage';
 import GameOverPage from './pages/GameOverPage';
-
+import PageApp from './components/PageApp';
 // Import GameComponent
 import GameComponent from './game-logic/MainGame';
 
@@ -54,6 +54,7 @@ const App: React.FC = () => {
             <Route path="/game" element={<GamePage socket={socket} />} />
             <Route path="/game-over" element={<GameOverPage />} />
             <Route path="/tutorial" element={<TutorialPage />} />
+            <Route path="/audio" element={<PageApp />} />
             <Route path="/item-store" element={<ItemStore />} />
           </Routes>
         </>
