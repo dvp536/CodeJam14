@@ -1,58 +1,6 @@
 import { useState } from 'react';
-import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
-
-const Container = styled.div`
-  padding: 20px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 15px;
-`;
-
-const BackButton = styled.button`
-  padding: 10px 20px;
-  font-size: 16px;
-  background-color: #007bff;
-  color: #fff;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-
-  &:hover {
-    background-color: #0056b3;
-  }
-`;
-
-const Title = styled.h2`
-  font-size: 24px;
-  color: #333;
-`;
-
-const Input = styled.input`
-  padding: 10px;
-  font-size: 16px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  width: 100%;
-  max-width: 400px;
-`;
-
-const StyledButton = styled.button`
-  padding: 10px 20px;
-  font-size: 16px;
-  background-color: #007bff;
-  color: #fff;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-
-  &:hover {
-    background-color: #0056b3;
-  }
-`;
+import './Styling/CreateRoom.css'; // Import the CSS file
 
 function CreateRoom() {
   const navigate = useNavigate();
@@ -62,39 +10,62 @@ function CreateRoom() {
 
   const handleCreateRoom = () => {
     console.log({ roomTitle, rounds, defaultMoney });
-    navigate('/game'); // Navigate to the game screen
+    navigate('/waitingRoom'); // Navigate to the game screen
+  };
+
+  const handleResetForm = () => {
+    setRoomTitle('');
+    setRounds(5);
+    setDefaultMoney(100);
   };
 
   return (
-    <Container>
-      <BackButton
-        onClick={() => {
-          navigate('/');
-        }}
-        > Back </BackButton>
-      <Title>Create Room</Title>
-      <Input
+    <div className="create-room-container">
+      <button 
+        className="back-button" 
+        onClick={() => navigate('/')}
+      >
+        Back
+      </button>
+      <h2 className="create-room-title">Create Room</h2>
+      <input
         type="text"
+        className="room-input"
         placeholder="Room Title"
         value={roomTitle}
         onChange={(e) => setRoomTitle(e.target.value)}
       />
-      <span>Number of rounds: </span>
-      <Input
+      <span className="label">Number of Rounds:</span>
+      <input
         type="number"
+        className="room-input"
         placeholder="Number of Rounds"
         value={rounds}
         onChange={(e) => setRounds(parseInt(e.target.value, 10))}
       />
-      <span>Default Money: </span>
-      <Input
+      <span className="label">Default Money:</span>
+      <input
         type="number"
+        className="room-input"
         placeholder="Default Money"
         value={defaultMoney}
         onChange={(e) => setDefaultMoney(parseInt(e.target.value, 10))}
       />
-      <StyledButton onClick={handleCreateRoom}>Create Room</StyledButton>
-    </Container>
+      <button className="room-button" onClick={handleCreateRoom}>
+        Create Room
+      </button>
+      <button className="room-reset-button" onClick={handleResetForm}>
+        Reset
+      </button>
+
+      {/* Preview Section */}
+      <div className="room-preview">
+        <h3>Room Preview</h3>
+        <p><strong>Title:</strong> {roomTitle || 'N/A'}</p>
+        <p><strong>Rounds:</strong> {rounds}</p>
+        <p><strong>Default Money:</strong> ${defaultMoney}</p>
+      </div>
+    </div>
   );
 }
 
