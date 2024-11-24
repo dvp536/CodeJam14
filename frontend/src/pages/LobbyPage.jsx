@@ -1,5 +1,3 @@
-// src/pages/LobbyPage.jsx
-
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
@@ -15,7 +13,6 @@ function LobbyPage({ socket }) {
     // Event handlers
     const handlePlayerJoined = ({ players }) => {
       setPlayers(players);
-      // Set host if the username matches the first player
       if (players[0]?.username === username) {
         setIsHost(true);
       } else {
@@ -46,19 +43,36 @@ function LobbyPage({ socket }) {
   };
 
   return (
-    <div style={{ padding: '20px' }}>
-      <h2>Lobby - Room ID: {roomId}</h2>
-      <h3>Players in Room:</h3>
-      <ul>
-        {players.map((player) => (
-          <li key={player.id}>{player.username}</li>
-        ))}
-      </ul>
-      {isHost && (
-        <button onClick={handleStartGame} style={{ marginTop: '20px' }}>
-          Start Game
-        </button>
-      )}
+    <div className="min-h-screen bg-gradient-to-b from-teal-500 to-cyan-400 flex flex-col items-center justify-center text-white p-6">
+      {/* Room Info */}
+      <div className="w-full max-w-lg bg-white text-gray-800 rounded-lg shadow-lg p-6">
+        <h2 className="text-2xl font-bold text-teal-600 mb-4">
+          Lobby - Room ID: <span className="font-mono text-gray-700">{roomId}</span>
+        </h2>
+        <h3 className="text-lg font-semibold text-gray-700 mb-3">Players in Room:</h3>
+
+        {/* Players List */}
+        <ul className="space-y-2">
+          {players.map((player) => (
+            <li
+              key={player.id}
+              className="px-4 py-2 bg-gray-100 rounded-lg border border-gray-300 shadow-sm"
+            >
+              {player.username}
+            </li>
+          ))}
+        </ul>
+
+        {/* Host-only Start Game Button */}
+        {isHost && (
+          <button
+            onClick={handleStartGame}
+            className="w-full mt-6 bg-teal-600 text-white font-semibold rounded-lg px-4 py-2 shadow-md hover:bg-teal-700 transition duration-300"
+          >
+            Start Game
+          </button>
+        )}
+      </div>
     </div>
   );
 }
