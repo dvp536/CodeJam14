@@ -234,32 +234,25 @@ function GamePage({ socket }) {
 
             <p className="mb-4 text-center">Choose your bet amount:</p>
 
-            {/* Predefined Bet Amounts */}
+            {/* Percentage Bet Amounts */}
             <div className="grid grid-cols-2 gap-4 mb-4">
-              {[25, 50, 100].map((amount) => (
-                <button
-                  key={amount}
-                  onClick={() => setBetAmount(amount)}
-                  className={`px-4 py-2 font-semibold rounded-lg shadow-md transition-transform duration-300 ${betAmount === amount
-                      ? 'bg-teal-700 text-white scale-105'
-                      : 'bg-gray-100 text-gray-700 hover:bg-teal-600 hover:text-white'
-                    }`}
-                >
-                  ${amount}
-                </button>
-              ))}
-
-              {/* MAX BET */}
-              <button
-                onClick={() => setBetAmount(playerMoney)}
-                className={`px-4 py-2 font-semibold rounded-lg shadow-md transition-transform duration-300 ${betAmount === playerMoney
-                    ? 'bg-teal-700 text-white scale-105'
-                    : 'bg-gray-100 text-gray-700 hover:bg-teal-600 hover:text-white'
-                  }`}
-              >
-                MAX BET (${playerMoney})
-              </button>
+              {[25, 50, 75, 100].map((percentage) => {
+                const calculatedAmount = Math.floor((percentage / 100) * playerMoney);
+                return (
+                  <button
+                    key={percentage}
+                    onClick={() => setBetAmount(calculatedAmount)}
+                    className={`px-4 py-2 font-semibold rounded-lg shadow-md transition-transform duration-300 ${betAmount === calculatedAmount
+                        ? 'bg-teal-700 text-white scale-105'
+                        : 'bg-gray-100 text-gray-700 hover:bg-teal-600 hover:text-white'
+                      }`}
+                  >
+                    {percentage}% (${calculatedAmount})
+                  </button>
+                );
+              })}
             </div>
+
 
             {/* Custom Bet Input */}
             <div className="flex items-center space-x-4">
@@ -317,8 +310,8 @@ function GamePage({ socket }) {
                   key={option}
                   onClick={() => setSelectedAnswer(option.charAt(0))}
                   className={`p-6 border-2 rounded-lg shadow-md transform transition-transform duration-300 cursor-pointer ${selectedAnswer === option.charAt(0)
-                      ? 'bg-teal-600 text-white scale-105 border-teal-800'
-                      : 'bg-white text-gray-700 hover:scale-105 hover:shadow-lg'
+                    ? 'bg-teal-600 text-white scale-105 border-teal-800'
+                    : 'bg-white text-gray-700 hover:scale-105 hover:shadow-lg'
                     }`}
                 >
                   <p className="text-xl font-semibold">{option}</p>
