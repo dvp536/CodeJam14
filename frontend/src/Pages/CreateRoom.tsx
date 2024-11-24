@@ -1,12 +1,13 @@
-import { useState } from 'react';
+
+import React, { useState, ChangeEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './Styling/CreateRoom.css'; // Import the CSS file
 
 function CreateRoom() {
   const navigate = useNavigate();
-  const [roomTitle, setRoomTitle] = useState('');
-  const [rounds, setRounds] = useState(5);
-  const [defaultMoney, setDefaultMoney] = useState(100);
+  const [roomTitle, setRoomTitle] = useState<string>('');
+  const [rounds, setRounds] = useState<number>(5);
+  const [defaultMoney, setDefaultMoney] = useState<number>(100);
 
   const handleCreateRoom = () => {
     console.log({ roomTitle, rounds, defaultMoney });
@@ -17,6 +18,16 @@ function CreateRoom() {
     setRoomTitle('');
     setRounds(5);
     setDefaultMoney(100);
+  };
+
+  const handleInputChange = (
+    setter: React.Dispatch<React.SetStateAction<number>>,
+    value: string
+  ) => {
+    const parsedValue = parseInt(value, 10);
+    if (!isNaN(parsedValue)) {
+      setter(parsedValue);
+    }
   };
 
   return (
@@ -33,7 +44,7 @@ function CreateRoom() {
         className="room-input"
         placeholder="Room Title"
         value={roomTitle}
-        onChange={(e) => setRoomTitle(e.target.value)}
+        onChange={(e: ChangeEvent<HTMLInputElement>) => setRoomTitle(e.target.value)}
       />
       <span className="label">Number of Rounds:</span>
       <input
@@ -41,7 +52,7 @@ function CreateRoom() {
         className="room-input"
         placeholder="Number of Rounds"
         value={rounds}
-        onChange={(e) => setRounds(parseInt(e.target.value, 10))}
+        onChange={(e: ChangeEvent<HTMLInputElement>) => handleInputChange(setRounds, e.target.value)}
       />
       <span className="label">Default Money:</span>
       <input
@@ -49,7 +60,7 @@ function CreateRoom() {
         className="room-input"
         placeholder="Default Money"
         value={defaultMoney}
-        onChange={(e) => setDefaultMoney(parseInt(e.target.value, 10))}
+        onChange={(e: ChangeEvent<HTMLInputElement>) => handleInputChange(setDefaultMoney, e.target.value)}
       />
       <button className="room-button" onClick={handleCreateRoom}>
         Create Room

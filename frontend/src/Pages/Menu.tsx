@@ -1,13 +1,13 @@
-import { useState } from "react";
+import React, { useState, ChangeEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import './Styling/Menu.css'; // Import the external CSS file
 
 function Menu() {
   const navigate = useNavigate();
-  const [username, setUsername] = useState('');
-  const [error, setError] = useState('');
+  const [username, setUsername] = useState<string>('');
+  const [error, setError] = useState<string>('');
 
-  const handleInputChange = (e) => {
+  const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     setUsername(e.target.value);
     setError(''); // Clear error when the user starts typing
   };
