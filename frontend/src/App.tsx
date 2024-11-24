@@ -11,6 +11,8 @@ import ScoreboardScreen from './Pages/ScoreboardScreen';
 
 // DO NOT CHANGE THESE PAGES
 import Navigation from './components/Navigation';
+import ItemStore from './components/ItemStore';
+
 import StartPage from './pages/StartPage';
 import CreateRoomPage from './pages/CreateRoomPage';
 import JoinRoomPage from './pages/JoinRoomPage';
@@ -52,6 +54,7 @@ const App: React.FC = () => {
             <Route path="/game" element={<GamePage socket={socket} />} />
             <Route path="/game-over" element={<GameOverPage />} />
             <Route path="/tutorial" element={<TutorialPage />} />
+            <Route path="/item-store" element={<ItemStore />} />
           </Routes>
         </>
       )}
