@@ -356,7 +356,8 @@ function GamePage({ socket }) {
               The correct answer was:
             </p>
             <div
-              className={`p-6 border-2 rounded-lg shadow-md bg-green-100 border-green-500 mb-4`}
+              className={`p-6 border-2 rounded-lg shadow-md ${isCorrect ? 'bg-green-100 border-green-500' : 'bg-red-100 border-red-500'
+                }  mb-4`}
             >
               <p className="text-xl font-semibold">{getCorrectOptionText()}</p>
             </div>
