@@ -1,7 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { io } from 'socket.io-client';
-import './App.css';
 
 // Import pages
 import Page from './Pages/Menu';
