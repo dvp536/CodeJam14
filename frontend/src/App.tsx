@@ -24,8 +24,12 @@ import PageApp from './components/PageApp';
 // Import GameComponent
 import GameComponent from './game-logic/MainGame';
 
-// Socket connection (Update the URL if needed)
-const socket = io('http://localhost:5000');
+// Dynamically set the WebSocket URL
+const socket = io(
+  import.meta.env.VITE_APP_SOCKET_URL || window.location.origin,
+  { transports: ['websocket', 'polling'] }
+);
+
 
 // Development mode toggle
 const devMode = false;
