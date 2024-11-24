@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { FaDollarSign, FaClock } from 'react-icons/fa';
 
 function GamePage({ socket }) {
-  const [phase, setPhase] = useState('betting'); // 'betting', 'question', 'results', 'waiting'
+  const [phase, setPhase] = useState('betting'); // 'betting', 'question', 'leaderboard', 'waiting'
   const [timer, setTimer] = useState(0);
   const [question, setQuestion] = useState('');
   const [options, setOptions] = useState([]);
@@ -14,9 +14,10 @@ function GamePage({ socket }) {
   const [round, setRound] = useState(1);
   const [errorMessage, setErrorMessage] = useState('');
   const [totalRounds, setTotalRounds] = useState(5);
-  const [notification, setNotification] = useState(''); // New notification state
-  const [leaderboardTimer, setLeaderboardTimer] = useState(10); // Timer for the leaderboard phase
-  const [isCorrect, setIsCorrect] = useState(false); // Whether the player's answer was correct
+  const [notification, setNotification] = useState('');
+  const [leaderboardTimer, setLeaderboardTimer] = useState(10);
+  const [isCorrect, setIsCorrect] = useState(false);
+  const [subject, setSubject] = useState(''); // New state for the subject
 
   const query = new URLSearchParams(useLocation().search);
   const roomId = query.get('roomId');
@@ -35,7 +36,8 @@ function GamePage({ socket }) {
     setTimer(data.bettingTime || 15);
     setBetAmount(null);
     setErrorMessage('');
-    setNotification(''); // Clear any previous notifications
+    setNotification('');
+    setSubject(data.subject || ''); // Set the subject
   };
 
   const handleQuestionPhase = (data) => {
@@ -45,7 +47,7 @@ function GamePage({ socket }) {
     setTimer(data.questionTime || 60);
     setSelectedAnswer('');
     setErrorMessage('');
-    setNotification(''); // Clear notifications
+    setNotification('');
   };
 
   const handleRoundEnded = (data) => {
@@ -58,7 +60,19 @@ function GamePage({ socket }) {
     setLeaderboardTimer(10); // Reset leaderboard timer to 10 seconds
   };
 
-
+  const handleLeaderboardPhase = (data) => {
+    setPhase('leaderboard');
+    setRound(data.round);
+    setTotalRounds(data.totalRounds);
+    setPlayersInfo(data.players);
+    setIsCorrect(
+      data.players.find((p) => p.username === username)?.isCorrect
+    );
+    setPlayerMoney(
+      data.players.find((p) => p.username === username)?.money || playerMoney
+    );
+    setLeaderboardTimer(data.leaderboardTime || 10);
+  };
 
   const handleGameOver = ({ winner, players }) => {
     navigate('/game-over', { state: { winner, players } });
@@ -66,7 +80,7 @@ function GamePage({ socket }) {
 
   const handleError = ({ message }) => {
     setErrorMessage(message);
-    setPhase('betting'); // Allow the player to try placing the bet again
+    setPhase('betting');
   };
 
   useEffect(() => {
@@ -76,7 +90,6 @@ function GamePage({ socket }) {
   useEffect(() => {
     console.log(`Timer: ${timer}, Leaderboard Timer: ${leaderboardTimer}`);
   }, [timer, leaderboardTimer]);
-
 
   // Attach event handlers
   useEffect(() => {
@@ -122,8 +135,6 @@ function GamePage({ socket }) {
     };
   }, [timer, leaderboardTimer, phase]);
 
-
-
   // Handle timer reaching zero
   useEffect(() => {
     if (phase === 'betting' && timer === 0) {
@@ -134,8 +145,6 @@ function GamePage({ socket }) {
       handleLeaderboardTimeUp();
     }
   }, [timer, leaderboardTimer, phase]);
-
-
 
   const handleBettingTimeUp = () => {
     if (betAmount === null || betAmount === undefined) {
@@ -153,25 +162,8 @@ function GamePage({ socket }) {
   };
 
   const handleLeaderboardTimeUp = () => {
-    // After the leaderboard timer ends, the server will emit the next phase
     setPhase('waiting');
   };
-
-
-  const handleLeaderboardPhase = (data) => {
-    setPhase('leaderboard');
-    setRound(data.round);
-    setTotalRounds(data.totalRounds);
-    setPlayersInfo(data.players);
-    setIsCorrect(
-      data.players.find((p) => p.username === username)?.isCorrect
-    );
-    setPlayerMoney(
-      data.players.find((p) => p.username === username)?.money || playerMoney
-    );
-    setLeaderboardTimer(data.leaderboardTime || 10);
-  };
-
 
   const handlePlaceBet = () => {
     if (betAmount < 0 || betAmount > playerMoney) {
@@ -209,13 +201,17 @@ function GamePage({ socket }) {
         </h2>
 
         {/* Timer and Money */}
-        <div className={`flex justify-between items-center  text-white font-semibold rounded-lg px-6 py-4 shadow-lg mb-6 ${getTimerClass(timer)}`}>
+        <div
+          className={`flex justify-between items-center text-white font-semibold rounded-lg px-6 py-4 shadow-lg mb-6 ${getTimerClass(
+            timer
+          )}`}
+        >
           <div className="flex items-center space-x-4">
             <FaDollarSign className="text-2xl" />
             <p className="text-xl">Money: ${playerMoney}</p>
           </div>
           <div className="flex items-center space-x-4">
-            <FaClock className={`text-2xl`} />
+            <FaClock className="text-2xl" />
             <p className="text-xl">Timer: {timer}s</p>
           </div>
         </div>
@@ -226,10 +222,17 @@ function GamePage({ socket }) {
 
         {phase === 'betting' && (
           <>
-            <h3 className="text-lg font-bold text-gray-700 mb-2">
+            <h3 className="text-2xl font-bold text-gray-700 mb-4 text-center">
               Betting Phase
             </h3>
-            <p className="mb-4">Choose your bet amount:</p>
+            {/* Announce the subject */}
+            <div className="mb-6">
+              <p className="text-lg text-gray-800 font-semibold text-center">
+                <span className="text-teal-600">Upcoming Subject:</span> {subject}
+              </p>
+            </div>
+
+            <p className="mb-4 text-center">Choose your bet amount:</p>
 
             {/* Predefined Bet Amounts */}
             <div className="grid grid-cols-2 gap-4 mb-4">
@@ -238,8 +241,8 @@ function GamePage({ socket }) {
                   key={amount}
                   onClick={() => setBetAmount(amount)}
                   className={`px-4 py-2 font-semibold rounded-lg shadow-md transition-transform duration-300 ${betAmount === amount
-                    ? 'bg-teal-700 text-white scale-105'
-                    : 'bg-gray-100 text-gray-700 hover:bg-teal-600 hover:text-white'
+                      ? 'bg-teal-700 text-white scale-105'
+                      : 'bg-gray-100 text-gray-700 hover:bg-teal-600 hover:text-white'
                     }`}
                 >
                   ${amount}
@@ -250,8 +253,8 @@ function GamePage({ socket }) {
               <button
                 onClick={() => setBetAmount(playerMoney)}
                 className={`px-4 py-2 font-semibold rounded-lg shadow-md transition-transform duration-300 ${betAmount === playerMoney
-                  ? 'bg-teal-700 text-white scale-105'
-                  : 'bg-gray-100 text-gray-700 hover:bg-teal-600 hover:text-white'
+                    ? 'bg-teal-700 text-white scale-105'
+                    : 'bg-gray-100 text-gray-700 hover:bg-teal-600 hover:text-white'
                   }`}
               >
                 MAX BET (${playerMoney})
@@ -283,7 +286,9 @@ function GamePage({ socket }) {
             )}
 
             {/* Players' Money */}
-            <h3 className="text-lg font-bold text-gray-700 mt-6">Players' Money</h3>
+            <h3 className="text-lg font-bold text-gray-700 mt-6">
+              Players' Money
+            </h3>
             <ul className="space-y-2">
               {playersInfo.map((player) => (
                 <li
@@ -302,19 +307,21 @@ function GamePage({ socket }) {
             <h3 className="text-2xl font-bold text-gray-700 mb-4 text-center">
               Question Phase
             </h3>
-            <p className="text-lg text-gray-600 mb-6 text-center">{question}</p>
+            <p className="text-lg text-gray-600 mb-6 text-center">
+              {question}
+            </p>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {options.map((option, index) => (
+              {options.map((option) => (
                 <div
                   key={option}
                   onClick={() => setSelectedAnswer(option.charAt(0))}
                   className={`p-6 border-2 rounded-lg shadow-md transform transition-transform duration-300 cursor-pointer ${selectedAnswer === option.charAt(0)
-                    ? 'bg-teal-600 text-white scale-105 border-teal-800'
-                    : 'bg-white text-gray-700 hover:scale-105 hover:shadow-lg'
+                      ? 'bg-teal-600 text-white scale-105 border-teal-800'
+                      : 'bg-white text-gray-700 hover:scale-105 hover:shadow-lg'
                     }`}
                 >
-                  <p className="text-xl font-semibold">{`${option}`}</p>
+                  <p className="text-xl font-semibold">{option}</p>
                 </div>
               ))}
             </div>
@@ -339,7 +346,9 @@ function GamePage({ socket }) {
             >
               {isCorrect ? 'You got it right!' : 'You got it wrong.'}
             </p>
-            <h4 className="text-lg font-bold text-gray-700 mb-2">Leaderboard</h4>
+            <h4 className="text-lg font-bold text-gray-700 mb-2">
+              Leaderboard
+            </h4>
             <ul className="space-y-2 mb-4">
               {playersInfo
                 .sort((a, b) => b.money - a.money)
@@ -362,7 +371,9 @@ function GamePage({ socket }) {
         )}
 
         {phase === 'waiting' && (
-          <p className="text-gray-600 font-medium">Waiting for other players...</p>
+          <p className="text-gray-600 font-medium">
+            Waiting for other players...
+          </p>
         )}
 
         {phase === 'results' && (
