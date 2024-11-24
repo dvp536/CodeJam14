@@ -40,7 +40,7 @@ function Navigation() {
       </div>
 
       {/* Mobile Navigation */}
-      <div className="md:hidden fixed bottom-0 left-0 w-full bg-gray-100 shadow-lg flex justify-around items-center py-3">
+      <div className="md:hidden fixed bottom-0 left-0 w-full bg-gray-100 shadow-lg flex justify-around items-center py-3" style={{ zIndex: 1000 }}>
         <Link
           to="/"
           className="flex flex-col items-center text-teal-600 hover:text-teal-800 transition-colors duration-300"
