@@ -4,10 +4,11 @@ interface ItemCardProps {
   name: string;
   price: number;
   icon: string;
+  audio: string;
   onBuy: () => void;
 }
 
-const ItemCard: React.FC<ItemCardProps> = ({ name, price, icon, onBuy }) => {
+const ItemCard: React.FC<ItemCardProps> = ({ name, price, icon, audio, onBuy }) => {
     const [showCoins, setShowCoins] = useState(false);
     const coinImage = new URL('../assets/Images/coin1.svg', import.meta.url).href;
     const coinImage1 = new URL('../assets/Images/coin1.svg', import.meta.url).href;
@@ -29,7 +30,12 @@ const ItemCard: React.FC<ItemCardProps> = ({ name, price, icon, onBuy }) => {
     console.log(coinImage1);
   
     const handleBuy = () => {
-      setShowCoins(true); // Trigger the coin animation
+      // Play the audio
+      const audioElement = new Audio(audio);
+      audioElement.play();
+
+      // Show the coins
+      setShowCoins(true);
       setTimeout(() => {
         setShowCoins(false); // Remove the coins after animation
         onBuy(); // Call the onBuy function
