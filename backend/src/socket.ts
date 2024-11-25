@@ -38,6 +38,7 @@ interface Room {
   settings: GameSettings;
   waitingForPlayers: boolean;
   roundInProgress: boolean;
+  usedQuestions: Set<string>;
 }
 
 interface QuestionData {
@@ -81,6 +82,7 @@ export const setupSocket = (io: Server) => {
         settings,
         waitingForPlayers: false,
         roundInProgress: false,
+        usedQuestions: new Set(),
       };
       rooms[roomId] = room;
       socket.join(roomId);
@@ -274,8 +276,24 @@ const startQuestionPhase = async (io: Server, room: Room) => {
     // Clear any existing timers
     if (room.questionTimer) clearTimeout(room.questionTimer);
 
-    const questionData = await getQuestionForSubject(room.currentSubject);
+    // Fetch a unique question, passing the set of used questions
+    const questionData = await getQuestionForSubject(
+      room.currentSubject,
+      room.usedQuestions // Pass the usedQuestions set
+    );
+
+    if (!questionData) {
+      console.error("Failed to fetch a valid question. Falling back to a default action.");
+      io.to(room.id).emit('error', { message: 'Failed to fetch a valid question for this round.' });
+      return; // Exit the method early if no question is returned
+    }
+
+    // Add the question to the set of used questions
+    room.usedQuestions.add(questionData.question);
+
+    // Set the current question
     room.currentQuestion = questionData;
+
 
     io.to(room.id).emit('questionPhase', {
       question: questionData.question,

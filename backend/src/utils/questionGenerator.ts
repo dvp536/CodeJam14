@@ -9,44 +9,62 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY || '',
 });
 
-export const getQuestionForSubject = async (subject: string) => {
-  const prompt = `As a trivia quiz generator, create a medium to challenging multiple-choice question about "${subject}". Indicate the correct answer. Format:
+export const getQuestionForSubject = async (subject: string, usedQuestions: Set<string>) => {
+  const maxAttempts = 5; // Limit attempts to avoid infinite loops
+  let attempts = 0;
+  let lastGeneratedQuestion = null; // Store the last valid question
+  let questionData;
 
-Question: ...
-A) Option 1
-B) Option 2
-C) Option 3
-D) Option 4
-Correct Answer: A/B/C/D`;
+  while (attempts < maxAttempts) {
+    attempts += 1;
 
-  try {
-    const completion = await openai.chat.completions.create({
-      model: 'gpt-4o-mini',
-      messages: [
-        {
-          role: 'system',
-          content:
-            'You are a helpful assistant that generates unique and interesting trivia questions for a quiz game.',
-        },
-        { role: 'user', content: prompt },
-      ],
-      temperature: 0.8, // Increased for more randomness
-      max_tokens: 200, // Adjusted to accommodate longer responses
-    });
+    const prompt = `
+      As a trivia quiz generator, create a medium to challenging unique multiple-choice question about "${subject}". Avoid questions that are similar to these: ${Array.from(usedQuestions).join(', ') || 'None'}. Format:
 
-    const text = completion.choices[0]?.message?.content || '';
-    const parsedQuestion = parseQuestion(text);
+      Question: ...
+      A) Option 1
+      B) Option 2
+      C) Option 3
+      D) Option 4
+      Correct Answer: A/B/C/D
+    `;
 
-    if (parsedQuestion) {
-      return parsedQuestion;
-    } else {
-      throw new Error('Failed to parse question');
+    try {
+      const completion = await openai.chat.completions.create({
+        model: 'gpt-4o-mini',
+        messages: [
+          {
+            role: 'system',
+            content:
+              'You are a helpful assistant that generates unique and interesting trivia questions for a quiz game.',
+          },
+          { role: 'user', content: prompt },
+        ],
+        temperature: 0.8, // Increased for more randomness
+        max_tokens: 200,
+      });
+
+      const text = completion.choices[0]?.message?.content || '';
+      questionData = parseQuestion(text);
+
+      if (questionData) {
+        if (!usedQuestions.has(questionData.question)) {
+          usedQuestions.add(questionData.question); // Add to used set
+          return questionData; // Return the unique question
+        } else {
+          lastGeneratedQuestion = questionData; // Keep track of the last duplicate
+        }
+      }
+    } catch (error) {
+      console.error('Error generating question:', error);
     }
-  } catch (error) {
-    console.error('Error generating question:', error);
-    throw new Error('Failed to generate question');
   }
+
+  console.warn('Reusing the last generated question due to repeated duplicates.');
+  return lastGeneratedQuestion; // Return the last generated question as a fallback
 };
+
+
 
 const parseQuestion = (text: string) => {
   const lines = text.trim().split('\n').filter((line) => line.trim() !== '');
